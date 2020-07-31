@@ -1,0 +1,15 @@
+<h1> Create a Room</h1>
+<%= form_for @room do |f|%>
+    <%= f.label "Room Name"%><br> 
+    <%= f.text_field :room_name%><br>
+    <%= f.label "Max Players"%><br> 
+    <%= f.number_field :max_players%><br>  
+    <%= f.label "Max Bets"%><br> 
+    <%= f.number_field :max_bets%><br>
+    <%= f.label "Room Color"%><br> 
+    <%= f.color_field :room_color%><br> 
+    <%= f.label "Start Time"%><br> 
+    <%= f.time_field :start_time%><br>  
+    <%= f.submit %>
+<%end%>
+
