@@ -7,4 +7,6 @@ Rails.application.routes.draw do
     get 'authorized', to: 'sessions#page_requires_login'
     get 'logout', to: 'sessions#logout' 
     get '', to: 'sessions#welcome'
+    get 'bank', to: 'sessions#bank'
+    get 'I_AM_A_GREEDY_BITCH', to: 'sessions#greed'
 end

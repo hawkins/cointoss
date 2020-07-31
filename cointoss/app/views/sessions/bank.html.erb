@@ -1,0 +1,11 @@
+<h1> International Bank of Cointoss </h1>
+
+<% if logged_in? %>
+    <h2> Welcome, <%= current_user.username%></h2>
+    <h2> Your Account Balance is: <%= current_user.account_balance.to_s%></h2>
+<% else %>
+    redirect_to '/welcome'
+<%end%>
+<%= button_to "Get More Money", '/I_AM_A_GREEDY_BITCH', method: :get%>
+<%= button_to "Home", '/welcome', method: :get%>
+
