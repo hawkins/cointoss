@@ -9,4 +9,5 @@ Rails.application.routes.draw do
     get '', to: 'sessions#welcome'
     get 'bank', to: 'sessions#bank'
     get 'I_AM_A_GREEDY_BITCH', to: 'sessions#greed'
+    get 'about', to: 'sessions#about'
 end
