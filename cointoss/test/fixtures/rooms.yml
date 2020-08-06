@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  room_id: 1
+  creation_time: 2020-08-05 17:13:34
+  current_users: 
+  alltime_users: 
+  max_bet: 1
+  max_users: 1
+  min_bet: 1
+  game_name: MyString
+  host_id: 1
+  locked: false
+
+two:
+  name: MyString
+  room_id: 1
+  creation_time: 2020-08-05 17:13:34
+  current_users: 
+  alltime_users: 
+  max_bet: 1
+  max_users: 1
+  min_bet: 1
+  game_name: MyString
+  host_id: 1
+  locked: false
