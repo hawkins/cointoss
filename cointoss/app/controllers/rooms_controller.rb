@@ -1,7 +1,7 @@
 class RoomsController < ApplicationController
 
     def index
-        #@rooms = Room.all
+        @rooms = Room.all
     end
 
     def new
@@ -25,7 +25,7 @@ class RoomsController < ApplicationController
                                               :max_bet,
                                               :min_bet,
                                               :house_wallet,
-                                              :max_players))
+                                              :max_users))
         end
     end
 

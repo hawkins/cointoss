@@ -1,7 +1,9 @@
 <h1> Create a Room</h1>
 <% if @room %>
-    <% @room.errors.for_each do | key,value | %>
-        <h2>Error: <%= key%>: <%= value%></h2>
+    <% if @room.errors.any? %>
+        <% @room.errors.full_messages.each do |message|%>
+            <p>Error: <%= message%></p>
+        <% end %>
     <% end %>    
 <% end %>
 <%= form_for @room do |f|%>

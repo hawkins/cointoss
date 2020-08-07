@@ -1,3 +1,16 @@
-// Place all the styles related to the rooms controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: http://sass-lang.com/
+table {
+    width: 800px;
+    border: 1px dashed #AAA;
+}
+td {
+    border: 1px solid #CCC;
+}
+.small {
+    width: 10px;
+}
+.big {
+    width: 50%;
+}
+td > div {
+    white-space: nowrap;
+}
