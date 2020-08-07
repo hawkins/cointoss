@@ -2,11 +2,12 @@
 <%= button_to "New Room", rooms_path + '/new', method: :get%>
 <table>
     <tr>
-        <th style="text-align:center" class="big"  >Name        </th>
-        <th style="text-align:center" class="small">Players     </th>
-        <th style="text-align:center" class="small">Money Left  </th>
-        <th style="text-align:center" class="small">Min Bet     </th>
-        <th style="text-align:center" class="small">Max Bet     </th>
+        <th style="text-align:center" class="big"  >Name</th>
+        <th style="text-align:center" class="small">Players</th>
+        <th style="text-align:center" class="small">Money Left</th>
+        <th style="text-align:center" class="small">Min Bet</th>
+        <th style="text-align:center" class="small">Max Bet</th>
+        <th style="text-align:center" class="small">Host</th>
     </tr>
     <% @rooms.each do |room| %>
         <tr>
@@ -15,6 +16,7 @@
             <td style="text-align:center" class="small">$<%= room.house_wallet %></td>
             <td style="text-align:center" class="small">$<%= room.min_bet %></td>
             <td style="text-align:center" class="small">$<%= room.max_bet %></td>
+            <td style="text-align:center" class="small">wip</td>
         </tr>
     <% end %>
 </table>
