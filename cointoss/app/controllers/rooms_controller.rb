@@ -4,7 +4,12 @@ class RoomsController < ApplicationController
         @rooms = Room.all
     end
 
-    def add_action_to_room
+    def update
+        puts :room_id
+        puts params[:room_id]
+        @room = Room.find_by(id: params[:actions][:room_id])
+        @room.actions.create(params[:actions].permit(:description, :odds))
+        show
     end
 
     def show

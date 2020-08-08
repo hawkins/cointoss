@@ -3,13 +3,16 @@
 <% username = user.username if user %>
 <h1> <%= @room.name %> hosted by <%= username%></h1>
 <% if current_user.id == @room.host_id %>
-    <%= form_for @action do |f|%>
-        <%= f.label "Action Description"%><br>
-        <%= f.text_field :description%><br>
-        <%= f.label "Percent Success"%><br>
-        <%= f.number_field :odds%><br>
-        <%= f.submit %>
-    <% end %>    
+    <%= form_for @room do |r|%>
+        <%= fields_for :actions do |a|%>
+            <%= a.label "Action Description"%><br>
+            <%= a.text_field :description%><br>
+            <%= a.label "Percent Success"%><br>
+            <%= a.number_field :odds%><br>
+            <%= a.hidden_field :room_id, value: @room.id%>
+            <%= a.submit "Add Action"%>
+        <% end %>
+    <% end %>
 <% end %>    
 <table>
     <tr>
@@ -17,9 +20,11 @@
         <th style="text-align:center" class="big">Action Description</th>
         <th style="text-align:center" class="small">Odds</th>
     </tr>
-    <% @room.active_actions do |action| %>
-        <td style="text-align:left" class="small"><%= action.id%></td>
-        <td style="text-align:left" class="big"><%= action.description%></td>
-        <td style="text-align:left" class="small"><%= action.odds%></td>
+    <% @room.actions.each do |action| %>
+        <tr>
+            <td style="text-align:left" class="small"><%= action.id%></td>
+            <td style="text-align:left" class="big"><%= action.description%></td>
+            <td style="text-align:left" class="small"><%= action.odds%></td>
+        </tr>
     <% end %>
 </table>
