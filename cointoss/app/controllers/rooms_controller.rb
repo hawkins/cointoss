@@ -85,7 +85,5 @@ class RoomsController < ApplicationController
     def set_current_user
         RoomsHelper.user = current_user
         yield
-    ensure
-        RoomsHelper.user = nil
     end
 end
