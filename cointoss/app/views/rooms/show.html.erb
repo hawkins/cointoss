@@ -1,37 +1,72 @@
 <% user = User.find_by(id: @room.host_id) %>
 <% username = "#ERR" %>
 <% username = user.username if user %>
-<h1> <%= @room.name %> hosted by <%= username%></h1>
-<% if current_user.id == @room.host_id %>
-    <%= form_for @room do |r|%>
-        <%= fields_for :actions do |a|%>
-            <%= a.label "Action Description"%><br>
-            <%= a.text_field :description%><br>
-            <%= a.label "Percent Success"%><br>
-            <%= a.number_field :odds%><br>
-            <%= a.hidden_field :room_id, value: @room.id%>
-            <%= a.submit "Add Action"%>
-        <% end %>
-    <% end %>
-<% end %>    
-<table>
-    <tr>
-        <th style="text-align:center" class="small"  >ID</th>
-        <th style="text-align:center" class="big">Action Description</th>
-        <th style="text-align:center" class="small">Odds</th>
-        <% if current_user.id == @room.host_id %>
-            <th style="text-align:center" class="small">Options</th>
-        <% end %>
+<h1>Welcome to <%= @room.name %>, hosted by <%= username %></h1>
 
-    </tr>
-    <% @room.actions.each do |action| %>
-        <tr>
-            <td style="text-align:left" class="small"><%= action.id%></td>
-            <td style="text-align:left" class="big"><%= action.description%></td>
-            <td style="text-align:left" class="small"><%= action.odds%></td>
-            <% if current_user.id == @room.host_id %>
-                <td style="text-align:left" class="small"><%= button_to "Delete", {:controller => :actions, :action => 'destroy', :id => action.id}, method: :delete%></td>
-            <% end %>
-        </tr>
+<%= form_with(url: room_actions_path(@room), method: :post) do |r| %>
+    <% if current_user.id == @room.host_id %>
+        <%= fields_for :actions do |a| %>
+            <%= a.label "Action Description" %><br>
+            <%= a.text_field :description %><br>
+            <%= a.label "Percent Success" %><br>
+            <%= a.number_field :odds %><br>
+            <%= a.hidden_field :room_id, value: @room.id %>
+            <%= a.submit "Add Action" %>
+        <% end %>
     <% end %>
-</table>
+<% end %>
+
+<% if current_user.id == @room.host_id %>
+    <table>
+        <tr>
+            <th style="text-align:center" class="small">ID</th>
+            <th style="text-align:center" class="big">Action Description</th>
+            <th style="text-align:center" class="small">Odds</th>
+            <th style="text-align:center" class="small">Options</th>
+        </tr>
+
+        <% @room.actions.each do |action| %>
+            <tr>
+                <td style="text-align:left" class="small"><%= action.id %></td>
+                <td style="text-align:left" class="big"><%= action.description %></td>
+                <td style="text-align:left" class="small"><%= action.odds %></td>
+
+                <td style="text-align:left" class="small"><%= button_to "Begone Thot", {controller: :actions, action: :destroy, room_id: @room.id, id: action.id}, method: :delete %></td>
+            </tr>
+        <% end %>
+    </table>
+<% else %>
+    <%= form_with(url: room_bets_path(@room)) do |r| %>
+        <table>
+            <tr>
+                <th style="text-align:center" class="small">ID</th>
+                <th style="text-align:center" class="big">Action Description</th>
+                <th style="text-align:center" class="small">Odds</th>
+                <th style="text-align:center" class="small">Wagers</th>
+            </tr>
+
+            <% @room.actions.each do |action| %>
+                <%= fields_for ("bet_" + action.id.to_s).to_sym do |t| %>
+                    <%= t.hidden_field :description, value: action.description %>
+                    <%= t.hidden_field :odds, value: action.odds %>
+                    <%= t.hidden_field :action_id, value: action.id %>
+
+                    <tr>
+                        <td style="text-align:left" class="small"><%= action.id %></td>
+                        <td style="text-align:left" class="big"><%= action.description %></td>
+                        <td style="text-align:left" class="small"><%= action.odds %></td>
+
+                        <td class="small"><%= t.number_field :wager_amount %></td>
+                    </tr>
+                <% end %>
+            <% end %>
+
+            <tr>
+                <td/>
+                <td/>
+                <td/>
+                <td class="small"><%= r.submit "Place Bet" %></td>
+            </tr>
+        </table>
+    <% end %>
+<% end %>
