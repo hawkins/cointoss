@@ -13,7 +13,7 @@
             <%= a.label "Action Description" %><br>
             <%= a.text_field :description %><br>
             <%= a.label "Percent Success" %><br>
-            <%= a.number_field :odds %><br>
+            <%= a.number_field :odds, max: 100, min: 1, step: 0.1 %><br>
             <%= a.hidden_field :room_id, value: @room.id %>
             <%= a.submit "Add Action" %>
         <% end %>
@@ -33,8 +33,7 @@
             <tr>
                 <td style="text-align:left" class="small"><%= action.id %></td>
                 <td style="text-align:left" class="big"><%= action.description %></td>
-                <td style="text-align:left" class="small"><%= action.odds %></td>
-
+                <td style="text-align:left" class="small"><%= (100 / action.odds).round(2) %> : 1</td>
                 <td style="text-align:left" class="small"><%= button_to "Begone Thot", {controller: :actions, action: :destroy, room_id: @room.id, id: action.id}, method: :delete %></td>
             </tr>
         <% end %>
@@ -58,7 +57,7 @@
                     <tr>
                         <td style="text-align:left" class="small"><%= action.id %></td>
                         <td style="text-align:left" class="big"><%= action.description %></td>
-                        <td style="text-align:left" class="small"><%= action.odds %></td>
+                        <td style="text-align:left" class="small"><%= (100 / action.odds).round(2) %> : 1</td>
 
                         <td class="small"><%= t.number_field :wager_amount %></td>
                     </tr>
