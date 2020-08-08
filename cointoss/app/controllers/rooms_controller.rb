@@ -36,12 +36,9 @@ class RoomsController < ApplicationController
 
     def show
         @room = Room.find(params[:id].to_i)
-        #if @room.current_users.include? current_user
-        #redirect_to rooms_path
-        #end
-        #if @room.host_id != current_user.id
-        #    redirect_to rooms_path
-        #end
+        if !@room.users.exists?(current_user.id)
+            redirect_to rooms_path
+        end
     end
 
     def new
