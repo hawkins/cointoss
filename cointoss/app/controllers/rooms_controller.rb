@@ -7,9 +7,13 @@ class RoomsController < ApplicationController
     def remove_user
         @user = User.find_by(id: params[:user_id])
         @room = Room.find_by(id: params[:room_id])
-        @room.users.delete(@user)
-        @user.room_id = nil
-        redirect_to rooms_path
+        if @user.id != @room.host_id
+            @room.users.delete(@user)
+            @user.room_id = nil
+            redirect_to rooms_path
+        else
+            redirect_back(fallback_location: rooms_path)
+        end
     end
 
     def destroy
@@ -20,7 +24,11 @@ class RoomsController < ApplicationController
         @room.users.delete_all
         @room.actions.destroy_all
         @room.bets.delete_all
-        User.find_by(id: @room.host_id).room_id = nil
+        @user = User.find_by(id: @room.host_id)
+        @user.update(room_id: nil)
+        if(@room.house_wallet > 0)
+            @user.update(account_balance: @user.account_balance + @room.house_wallet)
+        end
         @room.destroy
         redirect_back(fallback_location: rooms_path)
     end
@@ -34,9 +42,14 @@ class RoomsController < ApplicationController
     end
 
     def show
-        @room = Room.find(params[:id].to_i)
-        if !@room.users.exists?(current_user.id)
+        begin
+            @room = Room.find(params[:id].to_i)
+        rescue ActiveRecord::RecordNotFound
             redirect_to rooms_path
+        else
+            if !@room.users.exists?(current_user.id)
+                redirect_to rooms_path
+            end
         end
     end
 
