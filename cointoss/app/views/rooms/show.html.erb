@@ -3,6 +3,10 @@
 <% username = user.username if user %>
 <h1>Welcome to <%= @room.name %>, hosted by <%= username %></h1>
 
+<% if @room.users.exists?(current_user.id)%>
+    <%= button_to "Leave", {:controller => :rooms, :action => 'remove_user', :user_id => current_user.id, :room_id => @room.id}, method: :post%>
+<% end %>
+
 <%= form_with(url: room_actions_path(@room), method: :post) do |r| %>
     <% if current_user.id == @room.host_id %>
         <%= fields_for :actions do |a| %>

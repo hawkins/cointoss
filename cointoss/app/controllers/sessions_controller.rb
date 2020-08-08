@@ -26,6 +26,9 @@ class SessionsController < ApplicationController
   end
 
   def welcome
+      if current_user.present?
+          redirect_to rooms_path
+      end
   end
 
   def about
