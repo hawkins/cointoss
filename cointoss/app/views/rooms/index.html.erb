@@ -14,7 +14,7 @@
         <% username = "#ERR" %>
         <% username = user.username if user %>
         <tr>
-            <td style="text-align:left" class="big"><%= room.name %></td>
+            <td style="text-align:left" class="big"><%= link_to room.name, room %></td>
             <td style="text-align:center" class="small"><%= room.current_users.length%>/<%= room.max_users %></td>
             <td style="text-align:center" class="small">$<%= room.house_wallet %></td>
             <td style="text-align:center" class="small">$<%= room.min_bet %></td>

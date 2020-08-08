@@ -4,6 +4,19 @@ class RoomsController < ApplicationController
         @rooms = Room.all
     end
 
+    def add_action_to_room
+    end
+
+    def show
+        @room = Room.find(params[:id].to_i)
+        if @room.current_users.include? current_user
+            redirect_to rooms_path
+        end
+        if @room.host_id != current_user.id
+            redirect_to rooms_path
+        end
+    end
+
     def new
         @room = Room.new
     end
@@ -33,9 +46,5 @@ class RoomsController < ApplicationController
         else
             render :new
         end
-    end
-
-    def show
-        @room = Rooms.find(params[:id])
     end
 end

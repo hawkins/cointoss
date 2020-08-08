@@ -10,10 +10,31 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_06_003350) do
+ActiveRecord::Schema.define(version: 2020_08_08_015101) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "actions", force: :cascade do |t|
+    t.string "description"
+    t.float "odds"
+    t.string "game_name"
+    t.bigint "room_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["room_id"], name: "index_actions_on_room_id"
+  end
+
+  create_table "bets", force: :cascade do |t|
+    t.string "description"
+    t.float "odds"
+    t.string "game_name"
+    t.integer "wager_amount"
+    t.bigint "room_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["room_id"], name: "index_bets_on_room_id"
+  end
 
   create_table "rooms", force: :cascade do |t|
     t.string "name"
@@ -29,10 +50,6 @@ ActiveRecord::Schema.define(version: 2020_08_06_003350) do
     t.boolean "locked"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.json "active_actions", default: [], array: true
-    t.json "alltime_actions", default: [], array: true
-    t.json "active_bets", default: [], array: true
-    t.json "alltime_bets", default: [], array: true
     t.integer "room_state"
     t.integer "house_wallet"
   end
@@ -46,4 +63,6 @@ ActiveRecord::Schema.define(version: 2020_08_06_003350) do
     t.integer "birth_time"
   end
 
+  add_foreign_key "actions", "rooms"
+  add_foreign_key "bets", "rooms"
 end

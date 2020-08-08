@@ -10,4 +10,6 @@ class Room < ApplicationRecord
         message: "must be less than or equal to the initial room account balance."
     }
 
+    has_many :bets
+    has_many :actions
 end

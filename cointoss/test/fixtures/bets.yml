@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  description: MyString
+  odds: 1.5
+  game_name: MyString
+  wager_amount: 1
+  room: one
+
+two:
+  description: MyString
+  odds: 1.5
+  game_name: MyString
+  wager_amount: 1
+  room: two

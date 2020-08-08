@@ -11,4 +11,5 @@ Rails.application.routes.draw do
     get 'bank', to: 'sessions#bank'
     get 'I_AM_A_GREEDY_BITCH', to: 'sessions#greed'
     get 'about', to: 'sessions#about'
+    post 'add_action_to_room', to: 'rooms#add_action_to_room'
 end
