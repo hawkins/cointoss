@@ -63,8 +63,10 @@ class RoomsController < ApplicationController
 
         @room = Room.new
         if current_user.room_id.present?
-            @room.errors.add(:room, "Cannot create more than one room.")
+            @room.errors.add(:room, message: "Cannot create more than one room.")
+            @room.save
             redirect_back(fallback_location: rooms_path)
+            return 
         end
 
         @room = Room.create(params.require(:room)
