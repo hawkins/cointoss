@@ -19,12 +19,19 @@
         <th style="text-align:center" class="small"  >ID</th>
         <th style="text-align:center" class="big">Action Description</th>
         <th style="text-align:center" class="small">Odds</th>
+        <% if current_user.id == @room.host_id %>
+            <th style="text-align:center" class="small">Options</th>
+        <% end %>
+
     </tr>
     <% @room.actions.each do |action| %>
         <tr>
             <td style="text-align:left" class="small"><%= action.id%></td>
             <td style="text-align:left" class="big"><%= action.description%></td>
             <td style="text-align:left" class="small"><%= action.odds%></td>
+            <% if current_user.id == @room.host_id %>
+                <td style="text-align:left" class="small"><%= button_to "Delete", {:controller => :actions, :action => 'destroy', :id => action.id}, method: :delete%></td>
+            <% end %>
         </tr>
     <% end %>
 </table>

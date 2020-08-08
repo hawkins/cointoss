@@ -9,17 +9,17 @@ class RoomsController < ApplicationController
         puts params[:room_id]
         @room = Room.find_by(id: params[:actions][:room_id])
         @room.actions.create(params[:actions].permit(:description, :odds))
-        show
+        redirect_back(fallback_location: rooms_path) 
     end
 
     def show
         @room = Room.find(params[:id].to_i)
-        if @room.current_users.include? current_user
-            redirect_to rooms_path
-        end
-        if @room.host_id != current_user.id
-            redirect_to rooms_path
-        end
+        #if @room.current_users.include? current_user
+        #redirect_to rooms_path
+        #end
+        #if @room.host_id != current_user.id
+        #    redirect_to rooms_path
+        #end
     end
 
     def new
