@@ -1,4 +1,5 @@
 class RoomsController < ApplicationController
+    around_action :set_current_user
 
     def index
         @rooms = Room.all
@@ -88,5 +89,12 @@ class RoomsController < ApplicationController
         else
             render :new
         end
+    end
+
+    def set_current_user
+        RoomsHelper.user = current_user
+        yield
+    ensure
+        RoomsHelper.user = nil
     end
 end
