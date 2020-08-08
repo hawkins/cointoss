@@ -9,10 +9,16 @@ class BetsController < ApplicationController
                               .permit(:description, :odds, :wager_amount, :room_id, :user_id))
 
         wager = params[key][:wager_amount]
-        current_user.account_balance -= wager if @bet.valid?
-        @room.house_wallet += wager if @bet.valid?
 
-        @room.bets << @bet
+        if @bet.valid?
+
+          current_user.account_balance -= wager
+          current_user.save
+
+          @room.house_wallet += wager
+          @room.bets << @bet
+          @room.save
+        end
       end
     end
   end
