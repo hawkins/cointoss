@@ -9,7 +9,8 @@ class Room < ApplicationRecord
         less_than_or_equal_to: :house_wallet,
         message: "must be less than or equal to the initial room account balance."
     }
-
+    
+    has_many :users
     has_many :bets
     has_many :actions
 end

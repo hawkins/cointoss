@@ -8,6 +8,7 @@
         <th style="text-align:center" class="small">Min Bet</th>
         <th style="text-align:center" class="small">Max Bet</th>
         <th style="text-align:center" class="small">Host</th>
+        <th style="text-align:center" class="small">Options</th>
     </tr>
     <% @rooms.each do |room| %>
         <% user = User.find_by(id: room.host_id) %>
@@ -15,11 +16,22 @@
         <% username = user.username if user %>
         <tr>
             <td style="text-align:left" class="big"><%= link_to room.name, room %></td>
-            <td style="text-align:center" class="small"><%= room.current_users.length%>/<%= room.max_users %></td>
+            <td style="text-align:center" class="small"><%= room.users.length%>/<%= room.max_users %></td>
             <td style="text-align:center" class="small">$<%= room.house_wallet %></td>
             <td style="text-align:center" class="small">$<%= room.min_bet %></td>
             <td style="text-align:center" class="small">$<%= room.max_bet %></td>
             <td style="text-align:center" class="small"><%= username  %></td>
+            <% if current_user.id == room.host_id %>
+                <td style="text-align:center" class="small"><%= button_to "Close", {:controller => :rooms, :action => 'destroy', :id => room.id}, method: :delete%></td>
+            <% elsif room.users.exists?(current_user.id) %>
+                <td style="text-align:center" class="small"><%= button_to "Leave", {:controller => :rooms, :action => 'remove_user', :user_id => current_user.id, :room_id => room.id}, method: :post%></td>
+            <% elsif room.users.length < room.max_users %>
+                <% if not current_user.room_id.present? %>
+                    <td style="text-align:center" class="small"><%= button_to "Join", {:controller => :rooms, :action => 'add_user', :user_id => current_user.id, :room_id => room.id}, method: :post%></td>
+                <% end %>
+            <% else %>
+                <td style="text-align:center" class="small">FULL</td>
+            <% end %>
         </tr>
     <% end %>
 </table>

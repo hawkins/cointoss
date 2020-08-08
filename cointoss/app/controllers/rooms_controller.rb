@@ -4,9 +4,36 @@ class RoomsController < ApplicationController
         @rooms = Room.all
     end
 
+    def remove_user
+        @user = User.find_by(id: params[:user_id])
+        @room = Room.find_by(id: params[:room_id])
+        @room.users.delete(@user)
+        @user.room_id = nil
+        redirect_to rooms_path
+    end
+
+    def destroy
+        @room = Room.find_by(id: params[:id])
+        @room.users.each do |u|
+            u.room_id = nil
+        end
+        @room.users.delete_all
+        @room.actions.destroy_all
+        @room.bets.delete_all
+        User.find_by(id: @room.host_id).room_id = nil
+        @room.destroy
+        redirect_back(fallback_location: rooms_path)
+    end
+
+    def add_user
+        @user = User.find_by(id: params[:user_id])
+        @room = Room.find_by(id: params[:room_id])
+        @room.users << @user
+        @user.room = @room
+        redirect_to @room
+    end
+
     def update
-        puts :room_id
-        puts params[:room_id]
         @room = Room.find_by(id: params[:actions][:room_id])
         @room.actions.create(params[:actions].permit(:description, :odds))
         redirect_back(fallback_location: rooms_path) 
@@ -34,6 +61,12 @@ class RoomsController < ApplicationController
 
     def create
 
+        @room = Room.new
+        if current_user.room_id.present?
+            @room.errors.add(:room, "Cannot create more than one room.")
+            redirect_back(fallback_location: rooms_path)
+        end
+
         @room = Room.create(params.require(:room)
                                       .merge!(creation_time: Time.now(),
                                               host_id: current_user.id,
@@ -48,6 +81,8 @@ class RoomsController < ApplicationController
             
         if @room.valid?
             update_user_account_balance(@room.host_id, @room.house_wallet)
+            User.find_by(id: @room.host_id).update(room_id: @room.id)
+            redirect_to rooms_path
         else
             render :new
         end
