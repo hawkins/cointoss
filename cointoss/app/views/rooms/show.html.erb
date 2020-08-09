@@ -53,7 +53,7 @@
                 <td style="text-align:left" class="big"><%= action.description %></td>
                 <td style="text-align:left" class="small"><%= (100 / action.odds).round(2) %> : 1</td>
                 <% if @room.room_state == RoomsHelper::STANDBY_STAGE %>
-                    <td style="text-align:left" class="small"><%= button_to "Begone Thot", {controller: :actions, action: :destroy, room_id: @room.id, id: action.id}, method: :delete %></td>
+                    <td style="text-align:left" class="small"><%= button_to "Remove", {controller: :actions, action: :destroy, room_id: @room.id, id: action.id}, method: :delete %></td>
                 <% end %>
             </tr>
         <% end %>
@@ -79,17 +79,24 @@
                         <td style="text-align:left" class="big"><%= action.description %></td>
                         <td style="text-align:left" class="small"><%= (100 / action.odds).round(2) %> : 1</td>
 
-                        <td class="small"><%= t.number_field :wager_amount %></td>
+                        <% if @room.room_state == RoomsHelper::BETTING_STAGE %>
+                            <td class="small"><%= t.number_field :wager_amount %></td>
+                        <% elsif @room.room_state == RoomsHelper::PLAYING_STAGE %>
+                            <% this_bet = Bet.find_by(description: action.description, odds: action.odds, user_id: current_user.id) %>
+                            <td class="small"><%= this_bet.wager_amount unless this_bet.nil? %></td>
+                        <% end %>
                     </tr>
                 <% end %>
             <% end %>
 
-            <tr>
-                <td/>
-                <td/>
-                <td/>
-                <td class="small"><%= r.submit "Place Bet" %></td>
-            </tr>
+            <% if @room.room_state == RoomsHelper::BETTING_STAGE %>
+                <tr>
+                    <td/>
+                    <td/>
+                    <td/>
+                    <td class="small"><%= r.submit "Place Bet" %></td>
+                </tr>
+            <% end %>
         </table>
     <% end %>
 <% end %>
