@@ -17,4 +17,5 @@ Rails.application.routes.draw do
   post 'add_user', to: 'rooms#add_user'
   post 'remove_user', to: 'rooms#remove_user'
   post 'next_stage', to: 'rooms#next_stage'
+  post 'calculate_payouts', to: 'rooms#calculate_payouts'
 end

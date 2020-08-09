@@ -120,6 +120,35 @@ class RoomsController < ApplicationController
     yield
   end
 
+  # Handle form submission with information on which actions
+  # yielded a return or not, calculate payouts for each bet
+  # as a result of the action results, and advance the stage
+  def calculate_payouts
+    @room = Room.find_by(id: params[:room_id])
+
+    params.each do |key, value|
+      if key.start_with? "bet_"
+        did_yield = params[key][:yield].to_i == 1
+        bets = Bet.where(description: params[key][:description],
+                        odds: params[key][:odds],
+                        room_id: params[:room_id])
+
+        if did_yield
+          bets.each do |bet|
+            user = User.find_by(id: bet.user_id)
+            user.update(account_balance: user.account_balance + bet.potential_earning)
+          end
+        end
+
+        # TODO: Notify users of their results
+      end
+    end
+
+    @room.bets.delete_all
+
+    next_stage
+  end
+
   # Progress room to the next stage, updating @room.room_state
   #
   # @room.state has these values:
@@ -127,7 +156,8 @@ class RoomsController < ApplicationController
   #   1: Betting - Odds are locked and players can place bets now
   #   2: Playing - Game is in progress, bets are locked, admin can reward bets now
   def next_stage
-    @room = Room.find(params[:id])
+    id = params[:id] || params[:room_id]
+    @room = Room.find(id)
 
     return if current_user.id != @room.host_id
 
@@ -135,6 +165,6 @@ class RoomsController < ApplicationController
     @room.room_state = RoomsHelper::STANDBY_STAGE if @room.room_state > RoomsHelper::PLAYING_STAGE
     @room.save
 
-    render :show
+    redirect_to @room
   end
 end

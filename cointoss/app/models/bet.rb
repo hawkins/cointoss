@@ -21,4 +21,8 @@ class Bet < ApplicationRecord
 
   belongs_to :room
   belongs_to :user
+
+  def potential_earning
+    (self.wager_amount * (100 / self.odds)).to_i
+  end
 end
