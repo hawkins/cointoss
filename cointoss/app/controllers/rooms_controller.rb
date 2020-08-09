@@ -115,6 +115,8 @@ class RoomsController < ApplicationController
 
   def set_current_user
     RoomsHelper.user = current_user
+    RoomsHelper.room = @room
+    RoomsHelper.room = Room.find_by(id: params[:id]) if @room.nil?
     yield
   end
 

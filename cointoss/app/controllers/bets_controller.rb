@@ -16,8 +16,6 @@ class BetsController < ApplicationController
 
         @room.save
 
-        puts @room.errors.messages
-
         redirect_back(fallback_location: @room)
         return
       end
@@ -35,6 +33,7 @@ class BetsController < ApplicationController
           current_user.update(account_balance: current_user.account_balance - wager)
 
           @room.update(house_wallet: @room.house_wallet + wager, bets: @room.bets.concat(@bet))
+          redirect_to @room
         end
       end
     end

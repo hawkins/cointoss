@@ -44,7 +44,9 @@
             <th style="text-align:center" class="small">ID</th>
             <th style="text-align:center" class="big">Action Description</th>
             <th style="text-align:center" class="small">Odds</th>
-            <th style="text-align:center" class="small">Options</th>
+            <% if @room.room_state == RoomsHelper::STANDBY_STAGE %>
+                <th style="text-align:center" class="small">Options</th>
+            <% end %>
         </tr>
 
         <% @room.actions.each do |action| %>
@@ -100,3 +102,22 @@
         </table>
     <% end %>
 <% end %>
+<table>
+    <tr>
+        <th style="text-align:center" class="small">User</th>
+        <th style="text-align:center" class="big">Bet Description</th>
+        <th style="text-align:center" class="small">Odds</th>
+        <th style="text-align:center" class="small">Wager Amount</th>
+        <th style="text-align:center" class="small">Potential Earnings</th>
+    </tr>
+
+    <% @room.bets.each do |bet| %>
+        <tr>
+            <td style="text-align:left" class="small"><%= User.find_by(id: bet.user_id).username %></td>
+            <td style="text-align:left" class="big"><%= bet.description %></td>
+            <td style="text-align:left" class="small"><%= (100 / bet.odds).round(2) %> : 1</td>
+            <td class="small">$<%= bet.wager_amount %></td>
+            <td class="small">$<%= (bet.wager_amount * (100 / bet.odds)).round(0) %></td>
+        </tr>
+    <% end %>
+</table>
