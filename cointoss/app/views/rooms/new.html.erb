@@ -1,11 +1,15 @@
 <h1> Create a Room</h1>
-<% if @room %>
-    <% if @room.errors.any? %>
-        <% @room.errors.full_messages.each do |message|%>
-            <p>Error: <%= message%></p>
-        <% end %>
-    <% end %>    
+
+<% console %>
+
+<% unless @room.nil? %>
+    <% @room.errors.full_messages.each do |error| %>
+        <div class="alert alert-danger" role="alert">
+            <%= error %>
+        </div>
+    <% end %>
 <% end %>
+
 <%= form_for @room do |f|%>
     <%= f.label "Room Name"%><br> 
     <%= f.text_field :name%><br>
