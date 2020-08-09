@@ -20,18 +20,26 @@ class RoomsController < ApplicationController
 
   def destroy
     @room = Room.find_by(id: params[:id])
+    RoomsHelper.room = @room
+
     @room.users.each do |u|
       u.room_id = nil
     end
     @room.users.delete_all
+
     @room.actions.destroy_all
+
     @room.bets.delete_all
+
     @user = User.find_by(id: @room.host_id)
     @user.update(room_id: nil)
     if (@room.house_wallet > 0)
       @user.update(account_balance: @user.account_balance + @room.house_wallet)
     end
+
     @room.destroy
+    RoomsHelper.room = nil
+
     redirect_back(fallback_location: rooms_path)
   end
 
