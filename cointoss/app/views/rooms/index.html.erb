@@ -1,4 +1,16 @@
 <h1> Choose a Room, <%= current_user.username%>. </h1>
+
+<% console %>
+
+<!--TODO: Display errors such as leaving a room you own or leaving while in progress-->
+<%# unless @rooms.nil? %>
+    <%# @rooms.errors.full_messages.each do |error| %>
+<!--        <div class="alert alert-danger" role="alert">-->
+            <%#= error %>
+<!--        </div>-->
+    <%# end %>
+<%# end %>
+
 <%= button_to "New Room", rooms_path + '/new', method: :get%>
 <table>
     <tr>

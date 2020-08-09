@@ -1,5 +1,4 @@
 class RoomsController < ApplicationController
-  include RoomsHelper
   around_action :set_current_user
 
   def index
@@ -9,12 +8,21 @@ class RoomsController < ApplicationController
   def remove_user
     @user = User.find_by(id: params[:user_id])
     @room = Room.find_by(id: params[:room_id])
+
+    if @room.room_state == RoomsHelper::PLAYING_STAGE
+      @rooms.errors.add(:base, "You can't leave an in-progress game. Wait for the host to end the round.")
+      render :index
+      return
+    end
+
     if @user.id != @room.host_id
       @room.users.delete(@user)
       @user.room_id = nil
-      redirect_to rooms_path
+      render :index
     else
-      redirect_back(fallback_location: rooms_path)
+      @rooms.errors.add(:base, "You can't leave a game you're hosting. That would be rude!")
+      render :index
+      return
     end
   end
 
@@ -118,9 +126,13 @@ class RoomsController < ApplicationController
   #   2: Playing - Game is in progress, bets are locked, admin can reward bets now
   def next_stage
     @room = Room.find(params[:id])
-    @room.room_state += 1
-    @room.room_state = RoomsHelper.STANDBY_STAGE if @room.room_state > RoomsHelper.PLAYING_STAGE
 
-    redirect_back(fallback_location: @room)
+    return if current_user.id != @room.host_id
+
+    @room.room_state += 1
+    @room.room_state = RoomsHelper::STANDBY_STAGE if @room.room_state > RoomsHelper::PLAYING_STAGE
+    @room.save
+
+    render :show
   end
 end

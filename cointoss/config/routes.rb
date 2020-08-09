@@ -16,4 +16,5 @@ Rails.application.routes.draw do
   get 'about', to: 'sessions#about'
   post 'add_user', to: 'rooms#add_user'
   post 'remove_user', to: 'rooms#remove_user'
+  post 'next_stage', to: 'rooms#next_stage'
 end
