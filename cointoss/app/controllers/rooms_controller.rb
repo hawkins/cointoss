@@ -86,7 +86,7 @@ class RoomsController < ApplicationController
                          .merge!(creation_time: Time.now(),
                                  host_id: current_user.id,
                                  locked: false,
-                                 room_state: STANDBY_STAGE)
+                                 room_state: RoomsHelper::STANDBY_STAGE)
                          .permit(:name,
                                  :max_bet,
                                  :min_bet,
