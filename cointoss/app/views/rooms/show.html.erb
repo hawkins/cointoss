@@ -1,4 +1,4 @@
-gi<% user = User.find_by(id: @room.host_id) %>
+<% user = User.find_by(id: @room.host_id) %>
 <% username = "#ERR" %>
 <% username = user.username if user %>
 <h1>Welcome to <%= @room.name %>, hosted by <%= username %></h1>
@@ -19,9 +19,9 @@ gi<% user = User.find_by(id: @room.host_id) %>
     <% end %>
 <% end %>
 
-<% @room.errors.each do |error| %>
+<% @room.errors.full_messages.each do |error| %>
     <div class="alert alert-danger" role="alert">
-        <%= error[1] %>
+        <%= error %>
     </div>
 <% end %>
 
@@ -57,7 +57,6 @@ gi<% user = User.find_by(id: @room.host_id) %>
                         <%= fields_for ("bet_" + action.id.to_s).to_sym do |a| %>
                             <%= a.hidden_field :description, value: action.description %>
                             <%= a.hidden_field :odds, value: action.odds %>
-                            <%= a.hidden_field :action_id, value: action.id %>
                             <tr>
                                 <td style="text-align:left" class="small"><%= action.id %></td>
                                 <td style="text-align:left" class="big"><%= action.description %></td>
@@ -99,7 +98,7 @@ gi<% user = User.find_by(id: @room.host_id) %>
         </table>
     <% end %>
 <% else %>
-    <%= form_with(url: room_bets_path(@room)) do |r| %>
+    <%= form_with url: room_place_bets_url(@room) do |r| %>
         <table>
             <tr>
                 <th style="text-align:center" class="small">ID</th>
@@ -140,6 +139,8 @@ gi<% user = User.find_by(id: @room.host_id) %>
         </table>
     <% end %>
 <% end %>
+
+
 <table>
     <tr>
         <th style="text-align:center" class="small">User</th>

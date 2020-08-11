@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   resources :users, only: [:new, :create]
   resources :rooms do
     resources :actions, only: [:create, :destroy] # TODO: Editing actions?
-    resources :bets, only: [:create, :destroy]
+    post 'place_bets', to: 'rooms#place_bets'
   end
   get 'login', to: 'sessions#new'
   post 'login', to: 'sessions#create'

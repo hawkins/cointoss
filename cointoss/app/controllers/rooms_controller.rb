@@ -120,6 +120,60 @@ class RoomsController < ApplicationController
     yield
   end
 
+  def place_bets
+    @room = Room.find_by(id: params[:room_id])
+
+    valid_bets = []
+    invalid_bets = []
+
+    params.each do |key, value|
+      if @room.room_state != RoomsHelper::BETTING_STAGE
+        if @room.room_state == RoomsHelper::PLAYING_STAGE
+          @room.errors.add(:room, "You cannot place bets while the game is in progress.")
+        end
+        if @room.room_state == RoomsHelper::STANDBY_STAGE
+          @room.errors.add(:room, "You cannot place bets while the host is updating odds.")
+        end
+
+        # TODO: Shouldn't this just be render rooms/show?
+        render :show
+        return
+      end
+
+      if key.start_with? "bet_"
+        bet = Bet.new(params.require(key)
+                           .merge!(room_id: params[:room_id], user_id: current_user.id)
+                           .permit(:description, :odds, :wager_amount, :room_id, :user_id))
+
+        # Ignore bets where wager is nil or 0 because user did not take this bet
+        next if bet.wager_amount.nil? or bet.wager_amount.zero?
+
+        if bet.invalid?
+          invalid_bets << bet
+        else
+          valid_bets << bet
+        end
+      end
+    end
+
+    valid_bets.each do |bet|
+      wager = bet.wager_amount
+      current_user.update(account_balance: current_user.account_balance - wager)
+      @room.update(house_wallet: @room.house_wallet + wager, bets: @room.bets.concat(bet))
+    end
+
+    invalid_bets.each do |bet|
+      bet.errors.full_messages.each do |message|
+        @room.errors.add(:base, message)
+      end
+    end
+
+    @room.save
+
+    render :show
+    return
+  end
+
   # Handle form submission with information on which actions
   # yielded a return or not, calculate payouts for each bet
   # as a result of the action results, and advance the stage
