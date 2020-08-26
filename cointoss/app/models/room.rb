@@ -9,6 +9,11 @@ class Room < ApplicationRecord
         less_than_or_equal_to: :house_wallet,
         message: "must be less than or equal to the initial room account balance."
     }
+
+    validates :host_id, presence: {
+        on: :create,
+
+    }
     
     has_many :users
     has_many :bets
