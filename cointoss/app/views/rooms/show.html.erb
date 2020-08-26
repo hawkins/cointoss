@@ -1,39 +1,161 @@
-<% user = User.find_by(id: @room.host_id) %>
+gi<% user = User.find_by(id: @room.host_id) %>
 <% username = "#ERR" %>
 <% username = user.username if user %>
-<h1> <%= @room.name %> hosted by <%= username%></h1>
-<% if current_user.id == @room.host_id %>
-    <%= form_for @room do |r|%>
-        <%= fields_for :actions do |a|%>
-            <%= a.label "Action Description"%><br>
-            <%= a.text_field :description%><br>
-            <%= a.label "Percent Success"%><br>
-            <%= a.number_field :odds%><br>
-            <%= a.hidden_field :room_id, value: @room.id%>
-            <%= a.submit "Add Action"%>
+<h1>Welcome to <%= @room.name %>, hosted by <%= username %></h1>
+
+<% console %>
+
+<% if @room.users.exists?(current_user.id) and @room.host_id != current_user.id %>
+    <%= button_to "Leave", {:controller => :rooms, :action => 'remove_user', :user_id => current_user.id, :room_id => @room.id}, method: :post, disabled: @room.room_state == RoomsHelper::PLAYING_STAGE %>
+<% elsif @room.host_id == current_user.id %>
+    <%= button_to "Close", {:controller => :rooms, :action => 'destroy', :id => @room.id}, method: :delete, data: {confirm: "Are you sure you want to permenantly delete this room?"} %>
+
+    <% if @room.room_state == RoomsHelper::STANDBY_STAGE %>
+        <%= button_to "Open Betting", {:controller => :rooms, :action => 'next_stage', :id => @room.id}, method: :post %>
+    <% elsif @room.room_state == RoomsHelper::BETTING_STAGE %>
+        <%= button_to "Close Betting", {:controller => :rooms, :action => 'next_stage', :id => @room.id}, method: :post %>
+    <% elsif @room.room_state == RoomsHelper::PLAYING_STAGE %>
+        <%= button_to "Calculate Payouts", {:controller => :rooms, :action => 'next_stage', :id => @room.id}, method: :post %>
+    <% end %>
+<% end %>
+
+<% @room.errors.each do |error| %>
+    <div class="alert alert-danger" role="alert">
+        <%= error[1] %>
+    </div>
+<% end %>
+
+<% if @room.room_state == RoomsHelper::STANDBY_STAGE %>
+    <%= form_with(url: room_actions_path(@room), method: :post) do |r| %>
+        <% if current_user.id == @room.host_id %>
+            <%= fields_for :actions do |a| %>
+                <%= a.label "Action Description" %><br>
+                <%= a.text_field :description %><br>
+                <%= a.label "Percent Success" %><br>
+                <%= a.number_field :odds, max: 100, min: 1, step: 0.1 %><br>
+                <%= a.hidden_field :room_id, value: @room.id %>
+                <%= a.submit "Add Action" %>
+            <% end %>
         <% end %>
     <% end %>
-<% elsif @room.users.exists?(current_user.id)%>    
-    <%= button_to "Leave", {:controller => :rooms, :action => 'remove_user', :user_id => current_user.id, :room_id => @room.id}, method: :post%>
+<% end %>
+
+<% if current_user.id == @room.host_id %>
+    <% if @room.room_state == RoomsHelper::PLAYING_STAGE %>
+        <%= form_with url: calculate_payouts_url do |r| %>
+            <%= r.hidden_field :room_id, value: @room.id %>
+
+            <%= fields_for :actions do |t| %>
+                <table>
+                    <tr>
+                        <th style="text-align:center" class="small">ID</th>
+                        <th style="text-align:center" class="big">Action Description</th>
+                        <th style="text-align:center" class="small">Odds</th>
+                        <th style="text-align:center" class="small">Options</th>
+                    </tr>
+                    <% @room.actions.each do |action| %>
+                        <%= fields_for ("bet_" + action.id.to_s).to_sym do |a| %>
+                            <%= a.hidden_field :description, value: action.description %>
+                            <%= a.hidden_field :odds, value: action.odds %>
+                            <%= a.hidden_field :action_id, value: action.id %>
+                            <tr>
+                                <td style="text-align:left" class="small"><%= action.id %></td>
+                                <td style="text-align:left" class="big"><%= action.description %></td>
+                                <td style="text-align:left" class="small"><%= (100 / action.odds).round(2) %> : 1</td>
+                                <td style="text-align:left" class="small"><%= a.check_box :yield %></td>
+                            </tr>
+                        <% end %>
+                    <% end %>
+                    <tr>
+                        <td/>
+                        <td/>
+                        <td/>
+                        <td style="text-align:left" class="small"><%= t.submit "Calculate Payouts", {:controller => :rooms, :action => 'calculate_payouts', :id => @room.id} %></td>
+                    </tr>
+                <% end %>
+            </table>
+        <% end %>
+    <% else %>
+        <table>
+            <tr>
+                <th style="text-align:center" class="small">ID</th>
+                <th style="text-align:center" class="big">Action Description</th>
+                <th style="text-align:center" class="small">Odds</th>
+                <th style="text-align:center" class="small">Options</th>
+            </tr>
+
+            <% @room.actions.each do |action| %>
+                <tr>
+                    <td style="text-align:left" class="small"><%= action.id %></td>
+                    <td style="text-align:left" class="big"><%= action.description %></td>
+                    <td style="text-align:left" class="small"><%= (100 / action.odds).round(2) %> : 1</td>
+                    <% if @room.room_state == RoomsHelper::STANDBY_STAGE %>
+                        <td style="text-align:left" class="small"><%= button_to "Remove", {controller: :actions, action: :destroy, room_id: @room.id, id: action.id}, method: :delete %></td>
+                    <% elsif @room.room_state == RoomsHelper::BETTING_STAGE %>
+                        <td style="text-align:left" class="small"></td>
+                    <% end %>
+                    </tr>
+            <% end %>
+        </table>
+    <% end %>
+<% else %>
+    <%= form_with(url: room_bets_path(@room)) do |r| %>
+        <table>
+            <tr>
+                <th style="text-align:center" class="small">ID</th>
+                <th style="text-align:center" class="big">Action Description</th>
+                <th style="text-align:center" class="small">Odds</th>
+                <th style="text-align:center" class="small">Wagers</th>
+            </tr>
+
+            <% @room.actions.each do |action| %>
+                <%= fields_for ("bet_" + action.id.to_s).to_sym do |t| %>
+                    <%= t.hidden_field :description, value: action.description %>
+                    <%= t.hidden_field :odds, value: action.odds %>
+                    <%= t.hidden_field :action_id, value: action.id %>
+
+                    <tr>
+                        <td style="text-align:left" class="small"><%= action.id %></td>
+                        <td style="text-align:left" class="big"><%= action.description %></td>
+                        <td style="text-align:left" class="small"><%= (100 / action.odds).round(2) %> : 1</td>
+
+                        <% if @room.room_state == RoomsHelper::BETTING_STAGE %>
+                            <td class="small"><%= t.number_field :wager_amount %></td>
+                        <% elsif @room.room_state == RoomsHelper::PLAYING_STAGE %>
+                            <% this_bet = Bet.find_by(description: action.description, odds: action.odds, user_id: current_user.id) %>
+                            <td class="small"><%= this_bet.wager_amount unless this_bet.nil? %></td>
+                        <% end %>
+                    </tr>
+                <% end %>
+            <% end %>
+
+            <% if @room.room_state == RoomsHelper::BETTING_STAGE %>
+                <tr>
+                    <td/>
+                    <td/>
+                    <td/>
+                    <td class="small"><%= r.submit "Place Bet" %></td>
+                </tr>
+            <% end %>
+        </table>
+    <% end %>
 <% end %>
 <table>
     <tr>
-        <th style="text-align:center" class="small"  >ID</th>
-        <th style="text-align:center" class="big">Action Description</th>
+        <th style="text-align:center" class="small">User</th>
+        <th style="text-align:center" class="big">Bet Description</th>
         <th style="text-align:center" class="small">Odds</th>
-        <% if current_user.id == @room.host_id %>
-            <th style="text-align:center" class="small">Options</th>
-        <% end %>
-
+        <th style="text-align:center" class="small">Wager Amount</th>
+        <th style="text-align:center" class="small">Potential Earnings</th>
     </tr>
-    <% @room.actions.each do |action| %>
+
+    <% @room.bets.each do |bet| %>
         <tr>
-            <td style="text-align:left" class="small"><%= action.id%></td>
-            <td style="text-align:left" class="big"><%= action.description%></td>
-            <td style="text-align:left" class="small"><%= action.odds%></td>
-            <% if current_user.id == @room.host_id %>
-                <td style="text-align:left" class="small"><%= button_to "Delete", {:controller => :actions, :action => 'destroy', :id => action.id}, method: :delete%></td>
-            <% end %>
+            <td style="text-align:left" class="small"><%= User.find_by(id: bet.user_id).username %></td>
+            <td style="text-align:left" class="big"><%= bet.description %></td>
+            <td style="text-align:left" class="small"><%= (100 / bet.odds).round(2) %> : 1</td>
+            <td class="small">$<%= bet.wager_amount %></td>
+            <td class="small">$<%= (bet.wager_amount * (100 / bet.odds)).round(0) %></td>
         </tr>
     <% end %>
 </table>
