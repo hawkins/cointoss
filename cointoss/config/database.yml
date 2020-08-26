@@ -83,4 +83,4 @@ production:
 #  url: cointoss_production
 #  username: cointoss
 #  password: <%#= ENV['COINTOSS_DATABASE_PASSWORD'] %>
-    url: <%= ENV['DATABASE_URL'] %>
+  url: <%= ENV['DATABASE_URL'] %>
