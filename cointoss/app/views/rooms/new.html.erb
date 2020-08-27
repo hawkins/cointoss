@@ -1,7 +1,5 @@
 <h1> Create a Room</h1>
 
-<% console %>
-
 <% unless @room.nil? %>
     <% @room.errors.full_messages.each do |error| %>
         <div class="alert alert-danger" role="alert">
