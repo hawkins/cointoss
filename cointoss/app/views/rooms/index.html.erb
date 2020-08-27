@@ -1,7 +1,5 @@
 <h1> Choose a Room, <%= current_user.username%>. </h1>
 
-<% console %>
-
 <!--TODO: Display errors such as leaving a room you own or leaving while in progress-->
 <% unless @rooms.nil? %>
     <% @rooms.each do |room|%>

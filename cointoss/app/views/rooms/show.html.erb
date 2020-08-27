@@ -3,8 +3,6 @@ gi<% user = User.find_by(id: @room.host_id) %>
 <% username = user.username if user %>
 <h1>Welcome to <%= @room.name %>, hosted by <%= username %></h1>
 
-<% console %>
-
 <% if @room.users.exists?(current_user.id) and @room.host_id != current_user.id %>
     <%= button_to "Leave", {:controller => :rooms, :action => 'remove_user', :user_id => current_user.id, :room_id => @room.id}, method: :post, disabled: @room.room_state == RoomsHelper::PLAYING_STAGE %>
 <% elsif @room.host_id == current_user.id %>
