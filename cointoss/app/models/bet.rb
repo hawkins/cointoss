@@ -19,6 +19,12 @@ class Bet < ApplicationRecord
   #     message: "must be lower than the house wallet. They just can't afford it, dumbass. They're not backed by gold, you know. Try a lower bet."
   # }
 
+  validates :wager_amount, numericality: {
+      on: :create,
+      greater_than: 0,
+      message: "must be greater than 0."
+  }
+
   belongs_to :room
   belongs_to :user
 
