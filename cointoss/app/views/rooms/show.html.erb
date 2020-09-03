@@ -148,12 +148,13 @@ gi<% user = User.find_by(id: @room.host_id) %>
     </tr>
 
     <% @room.bets.each do |bet| %>
+        <% wager = bet.wager_amount || 0 %>
         <tr>
             <td style="text-align:left" class="small"><%= User.find_by(id: bet.user_id).username %></td>
             <td style="text-align:left" class="big"><%= bet.description %></td>
             <td style="text-align:left" class="small"><%= (100 / bet.odds).round(2) %> : 1</td>
-            <td class="small">$<%= bet.wager_amount %></td>
-            <td class="small">$<%= (bet.wager_amount * (100 / bet.odds)).round(0) %></td>
+            <td class="small">$<%= wager %></td>
+            <td class="small">$<%= (wager * (100 / bet.odds)).round(0) %></td>
         </tr>
     <% end %>
 </table>
